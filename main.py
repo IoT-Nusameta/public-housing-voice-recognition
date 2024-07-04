@@ -7,13 +7,19 @@ testVoice = sr.AudioFile('audio_python.wav')
 recognizer = sr.Recognizer()
 microphone = sr.Microphone()
 
+with open("dict.json") as thfile:
+    data = json.load(thfile)
+
+
 def get_command():
     try:
         with microphone as source:
-            victus = False
+            SpeakText("I am online")
             micAudio = recognizer.listen(source)
             command = recognizer.recognize_google(micAudio, language = "id-ID")
-            return command
+            if 'ikaris' in command:
+                command = command.replace('ikaris', '')
+                print(command)
     
     except sr.UnknownValueError:
         SpeakText("I do not understand")
@@ -30,20 +36,27 @@ def SpeakText(command):
     engine.say(command) 
     engine.runAndWait()
 
-ready = True
+def getSynonym(word):
+    if word in data.keys():
+        return data[word]["sinonim"]
+    else:
+        return None
 
-while(ready):
+listening = True
+
+while(listening):
     print("listening")
     command = get_command()
-    print(command)
-    if 'mainkan' in command:
+    if 'mainkan' or getSynonym('mainkan') in command.lower():
         song = command.replace('mainkan', '')
         SpeakText(f"playing {song}")
         pywhatkit.playonyt(song)
-    
+
+    elif ("nyala" and "lampu") or (getSynonym("nyala") and getSynonym("lampu")) in command.lower():
+        SpeakText("Turning on the lights")             
+                    
+    elif 'berhenti' in command.lower():
+        listening = False
         
-    elif 'berhenti' in command:
-        ready = False
-    
-    
+        
    # SpeakText(words)
