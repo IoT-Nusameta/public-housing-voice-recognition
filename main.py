@@ -20,6 +20,7 @@ def get_command():
             if 'ikaris' in command:
                 command = command.replace('ikaris', '')
                 print(command)
+                return command
     
     except sr.UnknownValueError:
         SpeakText("I do not understand")
@@ -40,19 +41,19 @@ def getSynonym(word):
     if word in data.keys():
         return data[word]["sinonim"]
     else:
-        return None
+        pass
 
 listening = True
 
 while(listening):
     print("listening")
     command = get_command()
-    if 'mainkan' or getSynonym('mainkan') in command.lower():
-        song = command.replace('mainkan', '')
-        SpeakText(f"playing {song}")
-        pywhatkit.playonyt(song)
+    #if "mainkan" or getSynonym("mainkan") in command.lower():
+    #    song = command.replace('mainkan', '')
+    #    SpeakText(f"playing {song}")
+    #    pywhatkit.playonyt(song)
 
-    elif ("nyala" and "lampu") or (getSynonym("nyala") and getSynonym("lampu")) in command.lower():
+    if ("nyala" and "lampu") or (getSynonym("nyala") and getSynonym("lampu")) in command.lower():
         SpeakText("Turning on the lights")             
                     
     elif 'berhenti' in command.lower():
