@@ -2,6 +2,7 @@ import speech_recognition as sr
 import pyttsx3 
 import pywhatkit
 import json
+from nicegui import app, ui
 
 testVoice = sr.AudioFile('audio_python.wav')
 recognizer = sr.Recognizer()
@@ -14,17 +15,13 @@ with open("dict.json") as thfile:
 def get_command():
     try:
         with microphone as source:
-            SpeakText("I am online")
             micAudio = recognizer.listen(source)
             command = recognizer.recognize_google(micAudio, language = "id-ID")
             if 'ikaris' in command:
                 command = command.replace('ikaris', '')
-                print(command)
-               
-    
+                
     except sr.UnknownValueError:
         SpeakText("I do not understand")
-        pass
     except sr.WaitTimeoutError:
         SpeakText("No speech detected")
     except Exception as e:
@@ -45,10 +42,11 @@ def getSynonym(word):
 
 listening = True
 
+
 while(listening):
     print("listening")
     command = get_command()
-    
+
     if "mainkan" in command.lower():
         song = command.replace('mainkan', '')
         SpeakText(f"playing {song}")
@@ -58,10 +56,11 @@ while(listening):
         SpeakText("Turning on the lights")             
                     
     elif 'keluar' in command.lower():
+        SpeakText("Exiting")
         listening = False
     
     else:
         print(command)
         
         
-   # SpeakText(words)
+  #Dear stranger who is reading this, I am having trouble with this code, if you could help in any way it would be appreciated.
