@@ -21,6 +21,6 @@ speechLog = ui.log(max_lines=100).classes('w-full h-60')
 
 command = get_command()
 
-ui.button("push to talk", on_click=lambda: speechLog.push(get_command()))
+ui.button("push to talk", on_click=lambda: speechLog.push(command))
 
 ui.run()

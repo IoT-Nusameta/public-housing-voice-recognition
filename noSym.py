@@ -4,7 +4,6 @@ import pywhatkit
 import json
 from nicegui import app, ui
 
-testVoice = sr.AudioFile('audio_python.wav')
 recognizer = sr.Recognizer()
 microphone = sr.Microphone()
 
@@ -15,17 +14,19 @@ with open("dict.json") as thfile:
 def get_command():
     try:
         with microphone as source:
-            micAudio = recognizer.listen(source)
+            micAudio = recognizer.listen(source, 5)
             command = recognizer.recognize_google(micAudio, language = "id-ID")
             if 'ikaris' in command:
                 command = command.replace('ikaris', '')
-                
     except sr.UnknownValueError:
         SpeakText("I do not understand")
+        command = 'say it again'
     except sr.WaitTimeoutError:
         SpeakText("No speech detected")
+        command = "say it again"
     except Exception as e:
         print("An error occured:", str(e))
+        command = 'say it again'
     return command
 
 def SpeakText(command):
@@ -46,7 +47,7 @@ listening = True
 while(listening):
     print("listening")
     command = get_command()
-
+    
     if "mainkan" in command.lower():
         song = command.replace('mainkan', '')
         SpeakText(f"playing {song}")

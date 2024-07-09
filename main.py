@@ -20,7 +20,6 @@ def get_command():
             if 'ikaris' in command:
                 command = command.replace('ikaris', '')
                 print(command)
-                return command
     
     except sr.UnknownValueError:
         SpeakText("I do not understand")
