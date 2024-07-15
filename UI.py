@@ -4,6 +4,7 @@ import speech_recognition as sr
 recognizer = sr.Recognizer()
 microphone = sr.Microphone()
 
+
 def get_command():
     try:
         with microphone as source:
@@ -16,11 +17,20 @@ def get_command():
     except Exception as e:
         command = "An error occured"
     return command
+
+
+
+@ui.refreshable
+def check_txt(data):
+    speechLog = ui.log(max_lines=100).classes('w-full h-60')
+    speechLog.push(data)
+            
+
 ui.label("Smart home app")
-speechLog = ui.log(max_lines=100).classes('w-full h-60')
 
-command = get_command()
-
-ui.button("push to talk", on_click=lambda: speechLog.push(command))
+with open('test.txt', 'r+') as file:
+    data = file.read()
+check_txt(data)
+ui.timer(1, lambda: check_txt.refresh(data))
 
 ui.run()

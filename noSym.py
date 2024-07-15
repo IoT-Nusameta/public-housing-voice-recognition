@@ -47,13 +47,16 @@ listening = True
 while(listening):
     print("listening")
     command = get_command()
+
+    with open('test.txt', 'a') as file:
+        file.writelines(f"\n{command}")
     
     if "mainkan" in command.lower():
         song = command.replace('mainkan', '')
         SpeakText(f"playing {song}")
         pywhatkit.playonyt(song)
 
-    if "nyala" and "lampu" in command.lower():
+    elif "nyala" and "lampu" in command.lower():
         SpeakText("Turning on the lights")             
                     
     elif 'keluar' in command.lower():
