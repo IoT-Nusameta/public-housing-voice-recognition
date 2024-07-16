@@ -1,36 +1,24 @@
-from nicegui import app, ui
-import speech_recognition as sr
+from nicegui import ui
+import pyttsx3
 
-recognizer = sr.Recognizer()
-microphone = sr.Microphone()
+txt_path = 'test.txt'
+my_name = 'apple'
+engine = pyttsx3.init()
+old_str_file = ''
 
+def read_text():
+    global old_str_file
 
-def get_command():
-    try:
-        with microphone as source:
-            micAudio = recognizer.listen(source)
-            command = recognizer.recognize_google(micAudio)
-    except sr.UnknownValueError:
-        command = "I do not understand"
-    except sr.WaitTimeoutError:
-        command = "No speech detected"
-    except Exception as e:
-        command = "An error occured"
-    return command
+    txt_file = open(txt_path, "r+")
+    str_file = txt_file.read()
+    print(str_file.lower())
+    if old_str_file != str_file:
+        if str_file.lower().find(my_name) != -1:
+            engine.say("Yes")
+            engine.runAndWait()
+    
+    old_str_file = str_file
 
-
-
-@ui.refreshable
-def check_txt(data):
-    speechLog = ui.log(max_lines=100).classes('w-full h-60')
-    speechLog.push(data)
-            
-
-ui.label("Smart home app")
-
-with open('test.txt', 'r+') as file:
-    data = file.read()
-check_txt(data)
-ui.timer(1, lambda: check_txt.refresh(data))
+ui.timer(1.0, lambda: read_text())
 
 ui.run()
