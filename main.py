@@ -1,62 +1,70 @@
-import speech_recognition as sr
-import pyttsx3 
-import pywhatkit
-import json
+#!/usr/bin/env python3
+"""This is just a simple authentication example.
 
-testVoice = sr.AudioFile('audio_python.wav')
-recognizer = sr.Recognizer()
-microphone = sr.Microphone()
+Please see the `OAuth2 example at FastAPI <https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/>`_  or
+use the great `Authlib package <https://docs.authlib.org/en/v0.13/client/starlette.html#using-fastapi>`_ to implement a classing real authentication system.
+Here we just demonstrate the NiceGUI integration.
+"""
+from typing import Optional
 
-with open("dict.json") as thfile:
-    data = json.load(thfile)
+from fastapi import Request
+from fastapi.responses import RedirectResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+
+from nicegui import Client, app, ui
+
+# in reality users passwords would obviously need to be hashed
+passwords = {'user1': 'pass1', 'user2': 'pass2'}
+
+unrestricted_page_routes = {'/login'}
 
 
-def get_command():
-    try:
-        with microphone as source:
-            SpeakText("I am online")
-            micAudio = recognizer.listen(source)
-            command = recognizer.recognize_google(micAudio, language = "id-ID")
-            if 'ikaris' in command:
-                command = command.replace('ikaris', '')
-                print(command)
-    
-    except sr.UnknownValueError:
-        SpeakText("I do not understand")
-        pass
-    except sr.WaitTimeoutError:
-        SpeakText("No speech detected")
-    except Exception as e:
-        print("An error occured:", str(e))
-    return command
+class AuthMiddleware(BaseHTTPMiddleware):
+    """This middleware restricts access to all NiceGUI pages.
 
-def SpeakText(command):
-    #Initialize the engine
-    engine = pyttsx3.init()
-    engine.say(command) 
-    engine.runAndWait()
+    It redirects the user to the login page if they are not authenticated.
+    """
 
-def getSynonym(word):
-    if word in data.keys():
-        return data[word]["sinonim"]
-    else:
-        pass
+    async def dispatch(self, request: Request, call_next):
+        if not app.storage.user.get('authenticated', False):
+            if request.url.path in Client.page_routes.values() and request.url.path not in unrestricted_page_routes:
+                app.storage.user['referrer_path'] = request.url.path  # remember where the user wanted to go
+                return RedirectResponse('/login')
+        return await call_next(request)
 
-listening = True
 
-while(listening):
-    print("listening")
-    command = get_command()
-    #if "mainkan" or getSynonym("mainkan") in command.lower():
-    #    song = command.replace('mainkan', '')
-    #    SpeakText(f"playing {song}")
-    #    pywhatkit.playonyt(song)
+app.add_middleware(AuthMiddleware)
 
-    if ("nyala" and "lampu") or (getSynonym("nyala") and getSynonym("lampu")) in command.lower():
-        SpeakText("Turning on the lights")             
-                    
-    elif 'berhenti' in command.lower():
-        listening = False
-        
-        
-   # SpeakText(words)
+
+@ui.page('/')
+def main_page() -> None:
+    with ui.column().classes('absolute-center items-center'):
+        ui.label(f'Hello {app.storage.user["username"]}!').classes('text-2xl')
+        ui.button(on_click=lambda: (app.storage.user.clear(), ui.navigate.to('/login')), icon='logout') \
+            .props('outline round')
+
+
+@ui.page('/subpage')
+def test_page() -> None:
+    ui.label('This is a sub page.')
+
+
+@ui.page('/login')
+def login() -> Optional
+$5#e:  # local function to avoid passing username and password as arguments
+        if passwords.get(username.value) == password.value:
+            app.storage.user.update({'username': username.value, 'authenticated': True})
+            ui.navigate.to(app.storage.user.get('referrer_path', '/'))  # go back to where the user wanted to go
+        else:
+            ui.notify('Wrong username or password', color='negative')
+
+    if app.storage.user.get('authenticated', False):
+        return RedirectResponse('/')
+    with ui.card().classes('absolute-center'):
+        username = ui.input('Username').on('keydown.enter', try_login)
+        password = ui.input('Password', password=True, password_toggle_button=True).on('keydown.enter', try_login)
+        ui.button('Log in', on_click=try_login)
+    return None
+
+
+ui.run(storage_secret='THIS_NEEDS_TO_BE_CHANGED')

@@ -27,7 +27,12 @@ def check_txt(data):
             
 
 ui.label("Smart home app")
+  
 
+with ui.row():
+    ui.button(text="turn on light 1")
+    ui.button(text="turn on light 2")
+    ui.button(text="turn on light 3")
 with open('test.txt', 'r+') as file:
     data = file.read()
 check_txt(data)
