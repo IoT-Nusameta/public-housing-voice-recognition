@@ -17,7 +17,7 @@ def get_command():
             micAudio = recognizer.listen(source, 5)
             command = recognizer.recognize_google(micAudio, language = "id-ID")
             if 'ikaris' in command:
-                command = command.replace('ikaris', '')
+                command = command
     except sr.UnknownValueError:
         SpeakText("I do not understand")
         command = 'say it again'
@@ -48,7 +48,7 @@ while(listening):
     print("listening")
     command = get_command()
 
-    with open('test.txt', 'a') as file:
+    with open('test.txt', 'w') as file:
         file.writelines(f"\n{command}")
     
     if "mainkan" in command.lower():

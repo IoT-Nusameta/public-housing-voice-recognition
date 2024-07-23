@@ -1,8 +1,7 @@
 from nicegui import app, ui
-import speech_recognition as sr
+# import speech_recognition as sr
 
-# recognizer = sr.Recognizer()
-# microphone = sr.Microphone()
+
 data = {"alcon": "marmut", 'test': 'pisang'}
 
 # def get_command():
@@ -29,7 +28,7 @@ def login():
     def check_pass():
         if data.get(username.value) == password.value:
             ui.notify("Correct password!")
-            ui.navigate.to('main_content')
+            ui.navigate.to('await')
         else:
             ui.notify("something is not right")
 
@@ -38,6 +37,11 @@ def login():
         password = ui.input('Password', password=True, password_toggle_button=True)
         ui.button('Log in', on_click=check_pass)
 
+@ui.page('/await')
+def static_mode():
+    ui.label('Awaiting voice activation')
+    with open('test.txt', 'r') as file:
+        data = file.read()
 @ui.page('/main_content')
 def main_content():
 
