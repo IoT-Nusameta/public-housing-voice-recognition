@@ -14,10 +14,16 @@ def get_command():
     return command
 
 while True:
-    txt_file = open("test.txt","w")
-    
     print('listening ...')
     command = get_command()
+    
+    with open('test.txt', 'w') as file:
+        file.writelines(f"{command}")
+    
     print(command)
 
-    txt_file.write(command)
+    # run both this .py and gui.py
+    # login page is loaded
+    # try to say "hey ikaris", whatever including "ikaris"
+    # from login page navitaged to test page
+    # try yo say "tutup aplikasi", whatever including tutup
