@@ -1,10 +1,13 @@
 import telegram
 import asyncio
 import time
+import os
+from dotenv import load_dotenv
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+load_dotenv()
 
-TOKEN= '7206986872:AAFnUPcquoXTOE1slzIO66udCQqoldCd3nU'
-BOT_USERNAME = '@AssconBot'
+TOKEN= os.getenv('TOKEN')
+BOT_USERNAME = os.getenv('BOT_USERNAME')
 
 bot = telegram.Bot(token=TOKEN)
 chat = "6314825879"
@@ -18,7 +21,6 @@ async def main():
     while True:    
         with open('test.txt', 'r+') as file:
             lines = file.readlines()
-            time.sleep(5)
             if "tolong" in lines[-1]:
                 asyncio.run(send_message("Emergency! Fire at A20", chat_id=chat))
                 
