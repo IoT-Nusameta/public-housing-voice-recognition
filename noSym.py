@@ -1,7 +1,8 @@
 import speech_recognition as sr
 import pyttsx3 
-import pywhatkit
+import pywhatkit as wa
 import json
+import asyncio
 from nicegui import app, ui
 
 recognizer = sr.Recognizer()
@@ -11,7 +12,7 @@ with open("dict.json") as thfile:
     data = json.load(thfile)
 
 
-def get_command():
+async def get_command():
     try:
         with microphone as source:
             micAudio = recognizer.listen(source, 5)
@@ -41,20 +42,24 @@ def getSynonym(word):
     else:
         pass
 
+async def hear():
+    await get_command()
+
 listening = True
 
 
 while(listening):
     print("listening")
-    command = get_command()
+    command = asyncio.run(get_command())
 
-    with open('test.txt', 'w') as file:
-        file.writelines(f"\n{command}")
+    with open('test.txt', 'a+') as file:
+        if not command == 'say it again':
+            file.writelines(f"\n{command}")
     
     if "mainkan" in command.lower():
         song = command.replace('mainkan', '')
         SpeakText(f"playing {song}")
-        pywhatkit.playonyt(song)
+        wa.playonyt(song)
 
     elif "nyala" and "lampu" in command.lower():
         SpeakText("Turning on the lights")             
@@ -62,7 +67,10 @@ while(listening):
     elif 'keluar' in command.lower():
         SpeakText("Exiting")
         listening = False
-    
+        
+    elif 'tolong' in command.lower():
+        SpeakText("calling for help")
+
     else:
         print(command)
         
