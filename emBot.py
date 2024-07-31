@@ -11,27 +11,29 @@ BOT_USERNAME = os.getenv('BOT_USERNAME')
 
 bot = telegram.Bot(token=TOKEN)
 chat = "6314825879"
+deny = "691646481"
 
-async def send_message(text, chat_id):
-    async with bot:
-        await bot.send_message(text=text, chat_id=chat_id)
+class botControl:
+    
+    async def send_message(self, text, chat_id):
+        async with bot:
+            await bot.send_message(text=text, chat_id=chat_id)
 
-async def main():
-
-    while True:    
+    async def warning(self, room):  
         with open('test.txt', 'r+') as file:
             lines = file.readlines()
-            if "tolong" in lines[-1]:
-                asyncio.run(send_message("Emergency! Fire at A20", chat_id=chat))
-                
-            elif "keluar" in lines[-1]:
-                break
-
+            if "kebakaran" in lines[-1]:
+                asyncio.run(self.send_message(f"Emergency! Fire at {room}", chat_id=deny))
+            elif 'maling' in lines[-1]:
+                asyncio.run(self.send_message(f"Emergency! Break in at {room}", chat_id=chat))
+            elif 'sakit' or 'tolong' in lines[-1]:
+                asyncio.run(self.send_message(f"Medical Emergency at {room}", chat_id=deny))
             else:
                 print("no activity")
     
 
-
-
 if __name__ == '__main__':
-    asyncio.run(main())
+    loop = asyncio.get_event_loop()
+    app = botControl()
+    asyncio.ensure_future(app.warning("A20"))
+    loop.run_forever()
