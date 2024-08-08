@@ -8,11 +8,8 @@ from nicegui import app, ui
 recognizer = sr.Recognizer()
 microphone = sr.Microphone()
 
-with open("dict.json") as thfile:
-    data = json.load(thfile)
-
-
-async def get_command():
+light_on = False
+def get_command():
     try:
         with microphone as source:
             micAudio = recognizer.listen(source, 5)
@@ -36,11 +33,6 @@ def SpeakText(command):
     engine.say(command) 
     engine.runAndWait()
 
-def getSynonym(word):
-    if word in data.keys():
-        return data[word]["sinonim"]
-    else:
-        pass
 
 async def hear():
     await get_command()
@@ -50,7 +42,7 @@ listening = True
 
 while(listening):
     print("listening")
-    command = asyncio.run(get_command())
+    command = get_command()
 
     with open('test.txt', 'a+') as file:
         if not command == 'say it again':
@@ -61,9 +53,15 @@ while(listening):
         SpeakText(f"playing {song}")
         wa.playonyt(song)
 
-    elif "nyala" and "lampu" in command.lower():
-        SpeakText("Turning on the lights")             
-                    
+    # elif ("nyala" or "matikan") and "lampu" in command.lower():
+    #     if light_on == False:
+    #         SpeakText("Turning on the lights If there is any")
+    #         UI.check_txt.refresh("Turning on the lights...If there is any")
+    #         light_on == True
+    #     elif light_on == True:
+    #         SpeakText("Turning off the lights If there is any")
+    #         UI.check_txt.refresh("Turning off the lights...If there is any")           
+    #         light_on == False        
     elif 'keluar' in command.lower():
         SpeakText("Exiting")
         listening = False
