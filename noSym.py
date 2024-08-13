@@ -3,7 +3,6 @@ import pyttsx3
 import pywhatkit as wa
 import json
 import asyncio
-from nicegui import app, ui
 
 recognizer = sr.Recognizer()
 microphone = sr.Microphone()
@@ -33,6 +32,24 @@ def SpeakText(command):
     engine.say(command) 
     engine.runAndWait()
 
+def load_json():
+    with open("light.json", 'r') as openfile:
+        json_object = json.load(openfile)
+        return json_object
+
+def query_light(relay):
+    tmp = load_json()
+    tmp_state = tmp[relay]
+    if tmp_state == 1:    
+        light_switch(relay, 0)
+    else:
+        light_switch(relay, 1)
+
+def light_switch(myKey, state):
+    relay_data = load_json()
+    relay_data[myKey] = state
+    with open("light.json", 'w') as jsonFile:
+        json.dump(relay_data, jsonFile)
 
 async def hear():
     await get_command()
@@ -43,25 +60,27 @@ listening = True
 while(listening):
     print("listening")
     command = get_command()
-
+    print(command)
     with open('test.txt', 'a+') as file:
         if not command == 'say it again':
             file.writelines(f"\n{command}")
-    
+      
     if "mainkan" in command.lower():
         song = command.replace('mainkan', '')
         SpeakText(f"playing {song}")
         wa.playonyt(song)
 
-    # elif ("nyala" or "matikan") and "lampu" in command.lower():
-    #     if light_on == False:
-    #         SpeakText("Turning on the lights If there is any")
-    #         UI.check_txt.refresh("Turning on the lights...If there is any")
-    #         light_on == True
-    #     elif light_on == True:
-    #         SpeakText("Turning off the lights If there is any")
-    #         UI.check_txt.refresh("Turning off the lights...If there is any")           
-    #         light_on == False        
+    elif ("nyala" or "matikan") in command.lower():
+        if "teras" in command.lower():
+            query_light("relay1")
+        
+        elif "kamar" in command.lower():
+            query_light("relay2")
+   
+        elif "halaman" in command.lower():
+            query_light("relay3")
+     
+
     elif 'keluar' in command.lower():
         SpeakText("Exiting")
         listening = False
@@ -70,7 +89,7 @@ while(listening):
         SpeakText("calling for help")
 
     else:
-        print(command)
+        print("No commands")
         
         
   #Dear stranger who is reading this, I am having trouble with this code, if you could help in any way it would be appreciated.
