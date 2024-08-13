@@ -1,12 +1,10 @@
 from nicegui import app, ui
 import datetime 
+import json
 # import speech_recognition as sr
 
 
 data = {"alcon": "marmut", 'test': 'pisang'}
-light1 = False
-light2 = False
-light3 = False
 
 prev = ""
 # def get_command():
@@ -21,6 +19,60 @@ prev = ""
     # except Exception as e:
         # command = "An error occured"
     # return command
+
+class ToggleButton1(ui.button):
+
+    def __init__(self, name, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._state = False
+        self.name = name
+        self.on('click', self.toggle)
+
+    def toggle(self) -> None:
+        """Toggle the button state."""
+        self._state = not self._state
+        self.update()
+
+    def update(self) -> None:
+        self.props(f'color={"green" if self._state else "red"}')
+        # self.light_switch("relay1")
+        if self._state:
+            self.light_switch(self.name, 1)
+        else:
+            self.light_switch(self.name, 0)
+        print(self._state)
+        super().update()
+
+    def light_switch(self, myKey, state):
+        relay_data = load_json()
+        relay_data[myKey] = state
+        with open("light.json", 'w') as jsonFile:
+                json.dump(relay_data, jsonFile)
+
+
+def load_json():
+    with open("light.json", 'r') as openfile:
+        json_object = json.load(openfile)
+        return json_object
+
+def init_light():
+    relay_data = load_json()
+    for i in relay_data:
+        relay_data[i] = 0
+    with open("light.json", 'w') as jsonFile:
+        json.dump(relay_data, jsonFile)
+    print(relay_data)
+# def light_switch(myKey):
+#     relay_data = load_json()
+#     print(relay_data)
+#     if relay_data[myKey] == 0:
+#         relay_data[myKey] = 1
+#         with open("light.json", 'w') as jsonFile:
+#             json.dump(relay_data, jsonFile)
+#     else:
+#         relay_data[myKey] = 0
+#         with open("light.json", 'w') as jsonFile:
+#             json.dump(relay_data, jsonFile)
 
 def page_check(current_page):
     with open('test.txt', 'r') as file:
@@ -71,13 +123,14 @@ def static_mode():
 
 @ui.page('/main_content')
 def main_content():
+    init_light()
     if "ikaris" or "Icarus" in data:
         with ui.card(align_items='center').classes('absolute-center'):
             ui.label("Smart home app")
             with ui.row():
-                ui.button(text="turn on light 1", on_click=lambda: try_log(speechLog, "Hypothethically turning on light 1...cause it doesnt exist"))
-                ui.button(text="turn on light 2", on_click=lambda: try_log(speechLog, "Turning on light 2...in theory"))
-                ui.button(text="turn on light 3", on_click=lambda: try_log(speechLog, "Turning on light 3...when there is one"))
+                ToggleButton1("relay1", "light 1")
+                ToggleButton1("relay2", "light 2")
+                ToggleButton1("relay3", "light 3")
                 speechLog = ui.log(max_lines=100).classes('w-full h-60')
                 # ui.timer(1, lambda: read_txt(data))
                 # ui.timer(4, lambda: check_txt(speechLog, data[-1]))

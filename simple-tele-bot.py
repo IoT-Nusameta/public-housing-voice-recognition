@@ -7,8 +7,8 @@ load_dotenv()
 
 command_txt_path = "test.txt"
 
-token = os.getenv('TOKEN')
-chat_id = os.getenv('CHAT_ID')
+token = os.getenv('TELETOKEN')
+chat_id = os.getenv('TELECHAT')
 
 class App:
 
@@ -18,18 +18,26 @@ class App:
             # read_str = txt_file.readlines().lower()
             with open('test.txt', 'r+') as file:
                 lines = file.readlines()
+            
+            with open('humanExist.txt', 'r+') as file:
+                human = file.readlines()
+                print(human[0])
             print(lines[-1])
+
+
+            if human[0] == "True":
+                msg = "Emergency! Maling at room A4"
+
+                url = f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={msg}"
+                print(requests.get(url).json())
+                    
             
             if "kebakaran" in lines[-1]:
                 msg = "Emergency! Fire at room A4"
 
                 url = f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={msg}"
                 print(requests.get(url).json())
-            elif "maling" or "tolong" in lines[-1]:
-                msg = "Emergency! Maling at room A4"
-
-                url = f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={msg}"
-                print(requests.get(url).json())
+    
             else:
                 print("no activity")
 
