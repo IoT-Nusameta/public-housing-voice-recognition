@@ -58,7 +58,7 @@ def listen_page():
 
     def empty_func(number, state):
         print(f"something{str(number)}: {state}")
-        button_bedroom.props('color=blue')
+        # button_bedroom.props('color=blue')
 
     class ToggleButton(ui.button):
         def __init__(self, *args, **kwargs) -> None:
@@ -88,7 +88,8 @@ def listen_page():
 
     ui.row().classes('h-80')
     with ui.row().classes('grid grid-cols-10 w-full gap-4'):
-        button_bedroom = ToggleButton('Bedroom').classes('col-start-2 col-span-2 h-10').props('fab')
+        # button_bedroom = ToggleButton('Bedroom').classes('col-start-2 col-span-2 h-10').props('fab')
+        ToggleButton('Bedroom').classes('col-start-2 col-span-2 h-10').props('fab')
         ToggleButton('Kitchen').classes('col-start-4 col-span-2 h-10').props('fab')
         ToggleButton('Backyard').classes('col-start-6 col-span-2 h-10').props('fab')
         ToggleButton('Street').classes('col-start-8 col-span-2 h-10').props('fab')
@@ -96,9 +97,9 @@ def listen_page():
     log = ui.log(max_lines=20).classes('w-full h-100')
 
     with ui.page_sticky(x_offset=18, y_offset=18):
-        ui.button(icon='lock', on_click=lambda:ui.navigate.to(listen_page)).props('fab color=red-5')
+        ui.button(icon='lock', on_click=lambda:ui.navigate.to(lock_page)).props('fab color=red-5')
 
 lock_page()
 
 ui.run(native=True, window_size=(480, 800), frameless=False)
-ui.run()
+# ui.run()
