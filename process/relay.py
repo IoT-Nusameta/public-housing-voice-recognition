@@ -1,5 +1,6 @@
-from gpiozero import LED
+from gpiozero import LED, CPUTemperature
 from time import sleep
+from signal import pause
 
 pin_array = [4, 22, 6, 26]
 
@@ -24,6 +25,28 @@ def toggle_all_relay():
         relay = define_relay(i)
         relay.off()
 
-# toggle_relay(0)
+def chip_temp():
+    cpu = CPUTemperature()
+    # print(cpu.temperature)
+    return cpu.temperature
+
+def state_relay(pin_index, state):
+    relay = define_relay(pin_index)
+    relay.on() if state == True else relay.off()
+    # pause()
+    # exit()
+
+# relay = define_relay(1)
+# while True:
+#     relay.on()
+#     sleep(2)
+#     relay.off()
+#     sleep(2)
+
+
+# state_relay(1, False)
+
+print(chip_temp())
+toggle_relay(1)
 # toggle_all_relay()
 # print("finish")

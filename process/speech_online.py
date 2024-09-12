@@ -14,8 +14,8 @@ cycle = 0
 def get_command():
     try:
         with microphone as source:
-            # micAudio = recognizer.listen(source, 5)
-            micAudio = recognizer.listen(source=source, timeout=3, phrase_time_limit=3)
+            micAudio = recognizer.listen(source, 5)
+            # micAudio = recognizer.listen(source=source, timeout=3, phrase_time_limit=3)
             command = recognizer.recognize_google(micAudio, language = "id-ID")
     except Exception as e:
         print(e)

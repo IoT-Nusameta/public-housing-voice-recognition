@@ -4,6 +4,12 @@ from nicegui import ui,app
 import os
 from datetime import datetime
 from dotenv import load_dotenv
+# from process.influxdb_interface import *
+# from process.relay import *
+from process.json_interface import *
+import subprocess
+# from gpiozero import LED, CPUTemperature
+
 load_dotenv()
 
 parent_path = os.getenv('PARENT_PATH')
@@ -60,10 +66,25 @@ def listen_page():
         print(f"something{str(number)}: {state}")
         # button_bedroom.props('color=blue')
 
+    # def toggle_relay(relay, state):
+
+
     class ToggleButton(ui.button):
         def __init__(self, *args, **kwargs) -> None:
             super().__init__(*args, **kwargs)
-            self._state = False
+            # self._state = False
+            if self._props['label'] == 'Bedroom':
+                self._state = read_relay('relay1')
+                # if self._state == True:
+                #     self._props['color'] = 'green'
+                # else:
+                #     self._props['color'] = 'red'
+            elif self._props['label'] == 'Kitchen':
+                self._state = read_relay('relay2')
+            elif self._props['label'] == 'Backyard':
+                self._state = read_relay('relay3')
+            elif self._props['label'] == 'Street':
+                self._state = read_relay('relay4')
             self.on('click', self.toggle)
         def toggle(self) -> None:
             """Toggle the button state."""
@@ -72,13 +93,17 @@ def listen_page():
         def update(self) -> None:
             self.props(f'color={"green" if self._state else "red"}')
             if self._props['label'] == 'Bedroom':
-                empty_func(1, self._state)
+                # empty_func(1, self._state)
+                make_state_relay('relay1', self._state)
             elif self._props['label'] == 'Kitchen':
-                empty_func(2, self._state)
+                # empty_func(2, self._state)
+                make_state_relay('relay2', self._state)
             elif self._props['label'] == 'Backyard':
-                empty_func(3, self._state)
+                # empty_func(3, self._state)
+                make_state_relay('relay3', self._state)
             elif self._props['label'] == 'Street':
-                empty_func(4, self._state)
+                # empty_func(4, self._state)
+                make_state_relay('relay4', self._state)
             super().update()
 
     with ui.page_sticky(position='top',x_offset=18, y_offset=18):
@@ -98,8 +123,46 @@ def listen_page():
 
     with ui.page_sticky(x_offset=18, y_offset=18):
         ui.button(icon='lock', on_click=lambda:ui.navigate.to(lock_page)).props('fab color=red-5')
+    # with ui.page_sticky(x_offset=18, y_offset=18, position='top-right'):
+    #     ui.button(icon='lock', on_click=lambda:ui.navigate.to(chart_page)).props('fab color=red-5')
+
+# @ui.page('/chart_page')
+# def chart_page():
+#     def get_data():
+#         timestamp, voltage_data, current_data, distance_data = query_influx()
+#         now = datetime.now().strftime('%H:%M:%S')
+#         voltage = voltage_data[-1]
+#         current = current_data[-1]
+#         log.push(f'[{now}] voltage: {voltage} V')
+#         log.push(f'[{now}] current: {current} A')
+#         log.push('-----------------------------')
+
+#     log = ui.log(max_lines=20).classes('w-full h-100')
+#     ui.timer(5.0, get_data)
+
+# subprocess.Popen(["/home/photobooth/public-housing-voice-recognition/.venv/bin/python", "/home/photobooth/public-housing-voice-recognition/process/speech_online.py"])
+# subprocess.Popen(["/home/photobooth/public-housing-voice-recognition/.venv/bin/python", "/home/photobooth/public-housing-voice-recognition/process/aio-serial.py"])
+# subprocess.Popen(["/home/photobooth/public-housing-voice-recognition/.venv/bin/python", "/home/photobooth/public-housing-voice-recognition/process/telebot.py"])
+
+# relay0 = define_relay(0)
+# relay1 = define_relay(1)
+# relay2 = define_relay(2)
+# relay3 = define_relay(3)
+
+# urutan = 0
+# def test_relay():
+#     global urutan
+    
+#     urutan += 1
+#     if urutan%2 == 0:
+#         relay0.on()
+#     else:
+#         relay0.off()
+
+
+# ui.timer(1.0, test_relay())
 
 lock_page()
 
-ui.run(native=True, window_size=(480, 800), frameless=False)
+ui.run(native=True, window_size=(480, 800), fullscreen=True ,frameless=False)
 # ui.run()
