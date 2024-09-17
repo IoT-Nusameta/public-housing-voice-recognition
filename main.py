@@ -3,12 +3,13 @@ multiprocessing.set_start_method("spawn", force=True)
 from nicegui import ui,app
 import os
 from datetime import datetime
+from dateutil import tz
 from dotenv import load_dotenv
-# from process.influxdb_interface import *
-# from process.relay import *
 from process.json_interface import *
+from process.influxdb_interface import *
 import subprocess
-# from gpiozero import LED, CPUTemperature
+import plotly.graph_objects as go
+from random import random
 
 load_dotenv()
 
@@ -123,44 +124,69 @@ def listen_page():
 
     with ui.page_sticky(x_offset=18, y_offset=18):
         ui.button(icon='lock', on_click=lambda:ui.navigate.to(lock_page)).props('fab color=red-5')
-    # with ui.page_sticky(x_offset=18, y_offset=18, position='top-right'):
-    #     ui.button(icon='lock', on_click=lambda:ui.navigate.to(chart_page)).props('fab color=red-5')
+    with ui.page_sticky(x_offset=18, y_offset=18, position='bottom-left'):
+        ui.button(icon='solar_power', on_click=lambda:ui.navigate.to(chart_page)).props('fab color=orange-5')
+    
 
-# @ui.page('/chart_page')
-# def chart_page():
-#     def get_data():
-#         timestamp, voltage_data, current_data, distance_data = query_influx()
-#         now = datetime.now().strftime('%H:%M:%S')
-#         voltage = voltage_data[-1]
-#         current = current_data[-1]
-#         log.push(f'[{now}] voltage: {voltage} V')
-#         log.push(f'[{now}] current: {current} A')
-#         log.push('-----------------------------')
+@ui.page('/chart_page')
+def chart_page():
+    ui.row().classes('h-40')
+    fig = go.Figure()
+    fig.update_layout(height=400,margin=dict(l=0, r=0, t=0, b=0))
+    plot = ui.plotly(fig).classes('w-full h-40')
 
-#     log = ui.log(max_lines=20).classes('w-full h-100')
-#     ui.timer(5.0, get_data)
+    def update_trace():
+        timestamp, voltage_data, current_data = query_power()
+
+        from_zone = tz.tzutc()
+        to_zone = tz.tzlocal()
+        local_timestamp = []
+
+        for i in timestamp:
+            str_utc = i.split('.')[0]
+            naive = datetime.strptime(str_utc, "%Y-%m-%dT%H:%M:%S")
+            utc = naive.replace(tzinfo=from_zone)
+            local = utc.astimezone(to_zone)
+            local_timestamp.append((local))
+        
+        my_dict = {
+            'data': [
+                {
+                    'type': 'scatter',
+                    'name': 'v_plot (mV)',
+                    'x': local_timestamp,
+                    'y': voltage_data,
+                    'line': {'width': 2},
+                },
+                {
+                    'type': 'scatter',
+                    'name': 'i_plot (mA)',
+                    'x': local_timestamp,
+                    'y': current_data,
+                    'line': {'dash': 'dot', 'width': 2},
+                },
+            ],
+            'layout': {
+                'legend': {
+                    'yanchor': "top",
+                    'y': 0.99,
+                    'xanchor': "left",
+                    'x': 0.01
+                }
+            }
+        }
+        fig.update(my_dict)
+        plot.update()
+
+    ui.timer(1.0, lambda:update_trace())
+
+    with ui.page_sticky(x_offset=18, y_offset=18):
+        ui.button(icon='lock', on_click=lambda:ui.navigate.to(lock_page)).props('fab color=red-5')
+    
 
 # subprocess.Popen(["/home/photobooth/public-housing-voice-recognition/.venv/bin/python", "/home/photobooth/public-housing-voice-recognition/process/speech_online.py"])
 # subprocess.Popen(["/home/photobooth/public-housing-voice-recognition/.venv/bin/python", "/home/photobooth/public-housing-voice-recognition/process/aio-serial.py"])
 # subprocess.Popen(["/home/photobooth/public-housing-voice-recognition/.venv/bin/python", "/home/photobooth/public-housing-voice-recognition/process/telebot.py"])
-
-# relay0 = define_relay(0)
-# relay1 = define_relay(1)
-# relay2 = define_relay(2)
-# relay3 = define_relay(3)
-
-# urutan = 0
-# def test_relay():
-#     global urutan
-    
-#     urutan += 1
-#     if urutan%2 == 0:
-#         relay0.on()
-#     else:
-#         relay0.off()
-
-
-# ui.timer(1.0, test_relay())
 
 lock_page()
 
