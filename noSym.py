@@ -11,26 +11,27 @@ light_on = False
 def get_command():
     try:
         with microphone as source:
+            recognizer.adjust_for_ambient_noise(source)
             micAudio = recognizer.listen(source, 5)
             command = recognizer.recognize_google(micAudio, language = "id-ID")
             if 'ikaris' in command:
                 command = command
     except sr.UnknownValueError:
-        SpeakText("I do not understand")
+        # SpeakText("I do not understand")
         command = 'say it again'
     except sr.WaitTimeoutError:
-        SpeakText("No speech detected")
+        # SpeakText("No speech detected")
         command = "say it again"
     except Exception as e:
         print("An error occured:", str(e))
         command = 'say it again'
     return command
 
-def SpeakText(command):
-    #Initialize the engine
-    engine = pyttsx3.init()
-    engine.say(command) 
-    engine.runAndWait()
+# def SpeakText(command):
+#     #Initialize the engine
+#     engine = pyttsx3.init()
+#     engine.say(command) 
+#     engine.runAndWait()
 
 def load_json():
     with open("light.json", 'r') as openfile:
@@ -67,11 +68,12 @@ while(listening):
       
     if "mainkan" in command.lower():
         song = command.replace('mainkan', '')
-        SpeakText(f"playing {song}")
+        # SpeakText(f"playing {song}")
         wa.playonyt(song)
 
     elif ("nyala" or "matikan") in command.lower():
         if "teras" in command.lower():
+            
             query_light("relay1")
         
         elif "kamar" in command.lower():
@@ -81,12 +83,12 @@ while(listening):
             query_light("relay3")
      
 
-    elif 'keluar' in command.lower():
-        SpeakText("Exiting")
-        listening = False
+    # elif 'keluar' in command.lower():
+    #     # SpeakText("Exiting")
+    #     listening = False
         
-    elif 'tolong' in command.lower():
-        SpeakText("calling for help")
+    # elif 'tolong' in command.lower():
+    #     # SpeakText("calling for help")
 
     else:
         print("No commands")

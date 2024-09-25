@@ -30,6 +30,7 @@ class ToggleButton1(ui.button):
 
     def toggle(self) -> None:
         """Toggle the button state."""
+        self.last_state = self._state
         self._state = not self._state
         self.update()
 
@@ -40,15 +41,35 @@ class ToggleButton1(ui.button):
             self.light_switch(self.name, 1)
         else:
             self.light_switch(self.name, 0)
-        print(self._state)
+        # print(self._state)
         super().update()
 
     def light_switch(self, myKey, state):
         relay_data = load_json()
         relay_data[myKey] = state
         with open("light.json", 'w') as jsonFile:
-                json.dump(relay_data, jsonFile)
-
+            json.dump(relay_data, jsonFile)
+    
+    def check_switch(self, myKey):
+        with open("light.json", "r+") as json_data:
+            relays = json.load(json_data)
+            print(f"state_relay1 = {relays["relay1"]}")
+            print(self._props["label"])
+            print(self._props)
+            if relays[myKey] == 1:
+                self._props['color'] = "green"
+                super().update()
+            else:
+                self._props['color'] = "red"
+                super().update()
+            # print(relays["relay2"])
+            # print(relays["relay3"])
+        # with open("test.txt", 'r') as openfile:
+        #     txt = openfile.readlines()
+        #     if "nyalakan" and light in txt[-1]:
+        #         self.toggle()
+        #     else:
+        #         pass
 
 def load_json():
     with open("light.json", 'r') as openfile:
@@ -116,7 +137,7 @@ def login():
 def static_mode():
     ui.label('Awaiting voice activation')
     with open('test.txt', 'r') as file:
-        data = file.read()
+        data = file.readlines()
     ui.timer(1, lambda: page_check('await'))
    
 
@@ -124,22 +145,23 @@ def static_mode():
 @ui.page('/main_content')
 def main_content():
     init_light()
-    if "ikaris" or "Icarus" in data:
+    if "ikaris" or "gitaris" in data:
         with ui.card(align_items='center').classes('absolute-center'):
             ui.label("Smart home app")
             with ui.row():
-                ToggleButton1("relay1", "light 1")
-                ToggleButton1("relay2", "light 2")
-                ToggleButton1("relay3", "light 3")
+                lampuTeras= ToggleButton1("relay1", "light 1")
+                lampuGarasi= ToggleButton1("relay2", "light 2")
+                lampuHalaman= ToggleButton1("relay3", "light 3")
                 speechLog = ui.log(max_lines=100).classes('w-full h-60')
                 # ui.timer(1, lambda: read_txt(data))
                 # ui.timer(4, lambda: check_txt(speechLog, data[-1]))
+                ui.timer(1, lambda: lampuTeras.check_switch("relay1"))
+                ui.timer(1, lambda: lampuGarasi.check_switch("relay2"))
+                ui.timer(1, lambda: lampuHalaman.check_switch("relay3"))
                 ui.timer(1, lambda: page_check('main'))
                 ui.timer(4, lambda: try_log(speechLog))
                 
     else:
         ui.label("Waiting....")
-    
-
 login()
 ui.run()
